@@ -1,10 +1,10 @@
 #!/bin/bash
 
-urgentColor="#[bg=red]"
-_20Color="#[fg=red]"
-_40Color="#[fg=yellow]"
-_60Color="#[fg=green,bright]"
-_80Color="#[fg=cyan,bright]"
+urgentColor="colour1"
+_20Color="colour3"
+_40Color="colour3"
+_60Color="colour11"
+_80Color="colour2"
 
 normal="\e[0m"
 percent=$(cat /sys/class/power_supply/BAT0/capacity)
@@ -30,4 +30,5 @@ elif [[ $state == "Charging" ]]; then
     amountIcon=""
 fi
 
-printf "$amountIcon: $color$percent"
+# printf "$amountIcon: $color$percent"
+printf "#[fg=$color, bg=colour0] #[fg=colour0, bg=$color] $amountIcon $percent #[fg=colour0, bg=$color]"
