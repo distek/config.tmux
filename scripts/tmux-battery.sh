@@ -7,9 +7,15 @@ _60Color="colour11"
 _80Color="colour2"
 
 normal="\e[0m"
-percent=$(cat /sys/class/power_supply/BAT0/capacity)
 
-state=$(cat /sys/class/power_supply/BAT0/status)
+if [ $(uname) = "Darwin" ]; then
+    pmsetOut=($(pmset -g ps | tail -n1 | awk '{gsub(";", ""); gsub("%", ""); print $3" "$4}'))
+    percent=${pmsetOut[0]}
+    state=${pmsetOut[1]}
+else
+    percent=$(cat /sys/class/power_supply/BAT0/capacity)
+    state=$(cat /sys/class/power_supply/BAT0/status)
+fi
 
 if ((percent <= 20)); then
     color=$urgentColor
@@ -27,8 +33,9 @@ elif ((percent <= 100)); then
     color=$_80Color
     amountIcon=""
 elif [[ $state == "Charging" ]]; then
+    color=$_80Color
     amountIcon=""
 fi
 
 # printf "$amountIcon: $color$percent"
-printf "#[fg=$color, bg=colour0] #[fg=colour0, bg=$color] $amountIcon $percent #[fg=colour0, bg=$color]"
+printf "#[fg=$color, bg=$bgColor] #[fg=$bgColor, bg=$color] $amountIcon $percent #[fg=$bgColor, bg=$color]"
