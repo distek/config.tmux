@@ -38,4 +38,4 @@ elif [[ $state == "Charging" ]]; then
 fi
 
 # printf "$amountIcon: $color$percent"
-printf "#[fg=$color, bg=$bgColor] #[fg=$bgColor, bg=$color] $amountIcon $percent #[fg=$bgColor, bg=$color]"
+printf "#[fg=$color, bg=$bgColor] #[fg=$bgColor, bg=$color] $amountIcon $percent #[fg=$bgColor, bg=$color]"
