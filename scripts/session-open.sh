@@ -25,15 +25,19 @@ if [ ! -z projectName ] && [ ! $projectName = "" ]; then
 		project=($(echo $i | sed "s/:/ /g"))
 
 		if [ ${project[1]} = $projectName ]; then
-			projectI=$(tmux ls | grep ${project[1]} | wc -l)
+			currentSessions=($(tmux ls | grep ${project[1]}))
+			if [ ${#currentSessions[@]} != 0 ]; then
+				tmux switch-client -t "$(echo ${currentSessions[0]})"
+				exit
+			fi
 
 			projectDir=$(grep -i '" cwd:' ${project[0]} | sed 's/"\ cwd://')
 
-			tmux new-session -c "$projectDir" -s ${project[1]}$projectI -d
+			tmux new-session -c "$projectDir" -s ${project[1]} -d
 
-			tmux send-keys -t "${project[1]}$projectI" " vim -c \"SessionLoad ${project[1]}\"" "Enter"
+			tmux send-keys -t "${project[1]}" " vim -c \"SessionLoad ${project[1]}\"" "Enter"
 
-			tmux switch-client -t "${project[1]}$projectI"
+			tmux switch-client -t "${project[1]}"
 		fi
 	done
 fi
