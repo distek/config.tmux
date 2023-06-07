@@ -2,8 +2,6 @@ import json
 import os
 from dataclasses import dataclass, fields
 
-# Broken
-
 
 @dataclass
 class Pane:
@@ -67,6 +65,8 @@ def createPanes(sessInfo: str, window: Window):
     focusMe = "0"
 
     for p in window.panes:
+        pane = DataClassUnpack.instantiate(Pane, p)
+
         if not first:
             commands.append(
                 f"tmux send-keys -t {sessInfo} splitw")
@@ -74,18 +74,18 @@ def createPanes(sessInfo: str, window: Window):
         first = False
 
         commands.append(
-            f"tmux send-keys -t {sessInfo}.{p.index} \"cd {p.path}\" Enter")
+            f"tmux send-keys -t {sessInfo}.{pane.index} \"cd {pane.path}\" Enter")
 
-        if p.command != "":
+        if pane.command != "":
             commands.append(
-                f"tmux send-keys -t {sessInfo}.{p.index} \"{p.command}\" Enter"
+                f"tmux send-keys -t {sessInfo}.{pane.index} \"{pane.command}\" Enter"
             )
 
-        if p.current == "true":
-            focusMe = p.index
+        if pane.current == "true":
+            focusMe = pane.index
 
         commands.append(
-            f"tmux send-keys -t {sessInfo}.{p.index} C-l"
+            f"tmux send-keys -t {sessInfo}.{pane.index} C-l"
         )
 
     commands.append(
@@ -100,31 +100,33 @@ def createWindows(session: Session):
 
     commands.append(f"tmux new-session -d -s \"{session.name}\"")
     if len(session.windows) == 1:
-        createPanes(session.windows[0])
-        return
+        sessInfo = f"\"{session.name}\":1"
+        commands = commands + createPanes(sessInfo, session.windows[0])
+    else:
+        first = True
 
-    first = True
+        focusMe = "0"
 
-    focusMe = "0"
+        for w in session.windows:
+            window = DataClassUnpack.instantiate(Window, w)
 
-    for window in session.windows:
-        sessInfo = f"\"{session.name}\":{window.index}"
+            sessInfo = f"\"{session.name}\":{window.index}"
 
-        if first:
+            if not first:
+                commands.append(
+                    f"tmux new-window -t {sessInfo} -n {window.name}")
+
+            first = False
+            commands = commands + createPanes(sessInfo, window)
+
+            if window.current == "true":
+                focusMe = window.index
+
             commands.append(
-                f"tmux send-keys -t {sessInfo} new-window -n {window.name}")
-
-        first = False
-        createPanes(sessInfo, window)
-
-        if window.current == "true":
-            focusMe = window.index
+                f"tmux select-layout -t {sessInfo} \"{window.layout}\"")
 
         commands.append(
-            f"tmux select-layout -t {sessInfo} \"{window.layout}\"")
-
-    commands.append(
-        f"tmux select-window -t \"{session.name}\"{focusMe}")
+            f"tmux select-window -t \"{session.name}\":{focusMe}")
 
     for c in commands:
         print(c)
