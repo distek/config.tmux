@@ -93,9 +93,6 @@ main() {
 		insert name "$(echo "$name" | sed 's/\*//')"
 		insComma
 
-		insert winCount $winCount
-		insComma
-
 		echo -n "\"panes\": [" >>"$sessionFile"
 		paneCount=0
 		windowPanes=($(tmux list-panes -t $index -F "#{pane_index}|#{pane_pid}|#{pane_current_path}|#{pane_active}"))

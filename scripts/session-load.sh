@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+#I fucking hate the shit out of this omg
 
 cd "$HOME/.config/tmux/sessions"
 
@@ -39,7 +40,7 @@ q() {
 addPanes() {
 	local paneCount="$(q "$thisWindowJSON" ".panes[] | .index" | wc -l)"
 
-	local windowIndex="$(q "$sessionJSON" ".windows[] | .index")"
+	local windowIndex="$(q "$thisWindowJSON" ".index")"
 
 	if ((paneCount > 1)); then
 		focusedPane=0
@@ -74,7 +75,9 @@ addPanes() {
 
 		tmuxCommand+=("tmux send-keys -t "$session":"$windowIndex" \"cd \"$(q "$paneJSON" ".path")\"\" Enter" \;)
 
-		tmuxCommand+=("tmux send-keys -t "$session":"$windowIndex" \"\"$(q "$paneJSON" ".command")\"\" Enter" \;)
+		if [[ "$(q "$paneJSON" ".command")" != "" ]]; then
+			tmuxCommand+=("tmux send-keys -t "$session":"$windowIndex" \"\"$(q "$paneJSON" ".command")\"\" Enter" \;)
+		fi
 	fi
 }
 
@@ -90,13 +93,11 @@ main() {
 		for i in $(eval echo {1..$windowCount}); do
 			local thisWindowJSON="$(q "$sessionJSON" ".windows[] | select(.index == \"$1\")")"
 
-			local windowIndex="$(q "$sessionJSON" ".windows[] | .index")"
-
 			tmuxCommand+=("tmux new-window -t "$session" -n "$(q "$thisWindowJSON" ".name")"")
 
 			addPanes "$thisWindowJSON"
 
-			tmuxCommand+=("tmux select-layout -t "$session":"$windowIndex" \""$(q "$thisWindowJSON" ".layout")"\"" \;)
+			tmuxCommand+=("tmux select-layout -t "$session":"$i" \""$(q "$thisWindowJSON" ".layout")"\"" \;)
 		done
 
 		tmuxCommand+=("tmux select-window -t "$session":"$focusedWindow"" \;)
@@ -114,7 +115,8 @@ main() {
 		tmuxCommand+=("tmux switch-client -t "$session"")
 	fi
 
-	eval "${tmuxCommand[@]}"
+	echo "${tmuxCommand[@]}"
+	# eval "${tmuxCommand[@]}"
 }
 
 main
