@@ -1,6 +1,6 @@
 import json
 import os
-from dataclasses import dataclass, fields
+from dataclasses import dataclass
 
 
 @dataclass
@@ -24,20 +24,6 @@ class Window:
 class Session:
     name: str
     windows: list[Window]
-
-
-class DataClassUnpack:
-    classFieldCache = {}
-
-    @classmethod
-    def instantiate(cls, classToInstantiate, argDict):
-        if classToInstantiate not in cls.classFieldCache:
-            cls.classFieldCache[classToInstantiate] = {
-                f.name for f in fields(classToInstantiate) if f.init}
-
-        fieldSet = cls.classFieldCache[classToInstantiate]
-        filteredArgDict = {k: v for k, v in argDict.items() if k in fieldSet}
-        return classToInstantiate(**filteredArgDict)
 
 
 def choose(choices):
@@ -65,11 +51,11 @@ def createPanes(sessInfo: str, window: Window):
     focusMe = "0"
 
     for p in window.panes:
-        pane = DataClassUnpack.instantiate(Pane, p)
+        pane = Pane(**p)
 
         if not first:
             commands.append(
-                f"tmux send-keys -t {sessInfo} splitw")
+                f"tmux splitw -t {sessInfo} ")
 
         first = False
 
@@ -108,7 +94,7 @@ def createWindows(session: Session):
         focusMe = "0"
 
         for w in session.windows:
-            window = DataClassUnpack.instantiate(Window, w)
+            window = Window(**w)
 
             sessInfo = f"\"{session.name}\":{window.index}"
 
@@ -128,8 +114,17 @@ def createWindows(session: Session):
         commands.append(
             f"tmux select-window -t \"{session.name}\":{focusMe}")
 
+    if os.getenv("TMUX") != "":
+        commands.append(
+            f"tmux switch-client -t \"{session.name}\"")
+    else:
+        commands.append(
+            f"tmux attach -t \"{session.name}\"")
+
     for c in commands:
-        print(c)
+        if os.system(c) != 0:
+            print(f"Failure on: {c}")
+            exit(1)
 
 
 def main():
@@ -146,7 +141,7 @@ def main():
 
         j = json.load(f)
 
-        unmarsh = DataClassUnpack.instantiate(Session, j)
+        unmarsh = Session(**j)
         sessions[unmarsh.name] = unmarsh
 
     for k, s in sessions.items():
@@ -157,6 +152,7 @@ def main():
     for k, s in sessions.items():
         if k == choice:
             createWindows(s)
+
             break
 
 
