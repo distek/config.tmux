@@ -40,7 +40,11 @@ def choose(choices):
 
     b = os.popen(cmd)
 
-    return b.readlines()[0].strip("\n")
+    lines = b.readlines()
+    if len(lines) == 0:
+        exit(0)
+
+    return lines[0].strip("\n")
 
 
 def createPanes(sessInfo: str, window: Window):
