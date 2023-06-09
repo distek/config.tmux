@@ -91,7 +91,8 @@ def createWindows(session: Session):
     commands.append(f"tmux new-session -d -s \"{session.name}\"")
     if len(session.windows) == 1:
         sessInfo = f"\"{session.name}\":1"
-        commands = commands + createPanes(sessInfo, session.windows[0])
+        window = Window(**session.windows[0])
+        commands = commands + createPanes(sessInfo, window)
     else:
         first = True
 
