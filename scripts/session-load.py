@@ -2,6 +2,9 @@ import json
 import os
 from dataclasses import dataclass
 
+# Load a session file created with session-save.py into a new session and
+# switch to it
+
 
 @dataclass
 class Pane:
