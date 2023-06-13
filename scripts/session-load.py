@@ -6,6 +6,8 @@ from dataclasses import dataclass
 # switch to it
 
 
+# Ultimately, what I'm trying to do here is force python to have structs
+# And python clearly doesn't want structs
 @dataclass
 class Pane:
     index: str
@@ -96,6 +98,8 @@ def createWindows(session: Session):
         sessInfo = f"\"{session.name}\":1"
         window = Window(**session.windows[0])
         commands = commands + createPanes(sessInfo, window)
+        commands.append(
+            f"tmux select-layout -t {sessInfo} \"{window.layout}\"")
     else:
         first = True
 

@@ -2,7 +2,7 @@ import os
 import json
 import platform
 
-# Save current tmux session as a json file to load later
+# Save current tmux session as a json file to load later with session-load.py
 
 
 def runCmd(cmd: str) -> str:
@@ -21,6 +21,9 @@ def main():
         os.makedirs(sessionPath, 0o750, True)
 
     name = input("Session name: ")
+
+    if name == "":
+        exit(0)
 
     winLines = runCmd(
         'tmux list-windows -F "{\\"index\\":\\"#{window_index}\\",\\"name\\":\\"#{window_name}\\",\\"layout\\":\\"#{window_layout}\\",\\"current\\":\\"#{window_active}\\"}"')
