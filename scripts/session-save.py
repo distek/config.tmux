@@ -5,17 +5,19 @@ import platform
 # Save current tmux session as a json file to load later with session-load.py
 
 
-def runCmd(cmd: str) -> str:
+def runCmd(cmd: str) -> list[str]:
     b = os.popen(cmd)
 
     lines = b.readlines()
     if len(lines) == 0:
-        exit(0)
+        return []
 
     return lines
 
 
 def main():
+    system = platform.system()
+
     sessionPath = f'{os.getenv("HOME")}/.config/tmux/sessions'
     if not os.path.isdir(sessionPath):
         os.makedirs(sessionPath, 0o750, True)
@@ -35,23 +37,33 @@ def main():
         paneLines = runCmd(
             f'tmux list-panes -t {wj["index"]} -F "{{\\"index\\":\\"#{{pane_index}}\\",\\"panePID\\":\\"#{{pane_pid}}\\",\\"path\\":\\"#{{pane_current_path}}\\",\\"current\\":\\"#{{pane_active}}\\"}}"')
 
+
         panes = []
         for p in paneLines:
             pj = json.loads(p.strip("\n"))
 
             command = ""
             if pj["panePID"] != "":
-                system = platform.system()
                 if system == "Linux":
                     c = runCmd(
                         f'ps -o command --ppid {pj["panePID"]}')
                     if len(c) > 1:
                         command = c[1].strip("\n")
                 elif system == "Darwin":
-                    c = runCmd(
-                        f'ps -o command -p $(pgrep -P {pj["panePID"]} | tail -n1)')
-                    if len(c) > 1:
-                        command = c[1].strip("\n")
+                    pgrepOut = runCmd(
+                        f'pgrep -P {pj["panePID"]} | tail -n1')
+
+                    if len(pgrepOut) == 0:
+                        p = ""
+                    else:
+                        p = pgrepOut[0].strip("\n")
+
+                        c = runCmd(
+                            f'ps -o command -p {p}')
+                        if len(c) > 1:
+                            command = c[1].strip("\n")
+                            
+
                 else:
                     print("No Wand0z support")
                     exit(1)

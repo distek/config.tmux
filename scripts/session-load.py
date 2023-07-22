@@ -76,7 +76,7 @@ def createPanes(sessInfo: str, window: Window):
                 f"tmux send-keys -t {sessInfo}.{pane.index} \"{pane.command}\" Enter"
             )
 
-        if pane.current == "true":
+        if pane.current == "1":
             focusMe = pane.index
 
         commands.append(
@@ -117,7 +117,7 @@ def createWindows(session: Session):
             first = False
             commands = commands + createPanes(sessInfo, window)
 
-            if window.current == "true":
+            if window.current == "1":
                 focusMe = window.index
 
             commands.append(
@@ -141,6 +141,9 @@ def createWindows(session: Session):
 
 def main():
     home = os.getenv("HOME")
+
+    if home == None:
+        return
 
     sessionFiles = os.scandir(home+"/.config/tmux/sessions")
 
