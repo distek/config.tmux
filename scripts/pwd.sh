@@ -9,20 +9,20 @@ dirs=($(echo "$1" | sed "s#$HOME#~#" | sed 's/\//\n/g'))
 count=0
 for i in "${dirs[@]}"; do
 	if [[ "$i" =~ "~" ]]; then
-		echo -n "~"
+		printf "~"
 		let count++
 		continue
 	fi
 
 	if ((count == ${#dirs[@]} - 1)); then
-		echo -n "/${i}"
+		printf "/${i}"
 
 		exit
 	else
 		if ((${#i} > 3)); then
-			echo -n "/${i:0:3}…"
+			printf "/${i:0:3}…"
 		else
-			echo -n "/${i}"
+			printf "/${i}"
 		fi
 
 		let count++
