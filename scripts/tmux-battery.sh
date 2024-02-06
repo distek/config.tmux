@@ -40,4 +40,4 @@ elif ((percent <= 100)); then
 fi
 
 # printf "$amountIcon: $color$percent"
-printf "#[fg=$color, bg=$bgColor] #[fg=$bgColor, bg=$color] $amountIcon $percent #[fg=$bgColor, bg=$color]"
+printf "#[fg=$color, bg=colour0] #[fg=colour0, bg=$color] $amountIcon $percent #[fg=colour0, bg=$color]"
