@@ -1,0 +1,8 @@
+sessions:
+  sessions_path: "~/.config/tmux/sessions"
+  restore_cmds:
+    - "vim"
+    - "nvim"
+    - "less"
+    - "tail"
+    - "man"
