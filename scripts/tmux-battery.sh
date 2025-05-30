@@ -9,7 +9,7 @@ _80Color="colour2"
 normal="\e[0m"
 
 if [ $(uname) = "Darwin" ]; then
-	pmsetOut=($(pmset -g ps | tail -n1 | awk '{gsub(";", ""); gsub("%", ""); print $3" "$4}'))
+	pmsetOut=($(pmset -g ps | grep -v "Battery Warning" | tail -n1 | awk '{gsub(";", ""); gsub("%", ""); print $3" "$4}'))
 
 	percent=${pmsetOut[0]}
 
