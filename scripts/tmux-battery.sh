@@ -1,9 +1,9 @@
 #!/bin/bash
 
-urgentColor="colour1"
-_20Color="colour3"
-_40Color="colour3"
-_60Color="colour11"
+urgentColor="colour9"
+_20Color="colour1"
+_40Color="colour11"
+_60Color="colour3"
 _80Color="colour2"
 
 normal="\e[0m"
@@ -39,5 +39,4 @@ elif ((percent <= 100)); then
 	amountIcon="󰁹"
 fi
 
-# printf "$amountIcon: $color$percent"
-printf "#[fg=$color, bg=colour0] #[fg=colour0, bg=$color] $amountIcon $percent #[fg=colour0, bg=$color]"
+printf "#[fg=$color, bg=colour235] $amountIcon ${percent}%% #[fg=colour0, bg=$color]"
